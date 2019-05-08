@@ -93,8 +93,8 @@ namespace AzureScheduledTrigger
             var accountButtons = menuWindow.FindElements(By.ClassName("accountButton"));
             var loginBtn = accountButtons[accountButtons.Count - 1]; // Last btn is Login
             
-            accName.SendKeys(userName);
-            accPass.SendKeys(passWord);
+            accName.SendKeys("");
+            accPass.SendKeys("");
 
             loginBtn.Click();
             Thread.Sleep(500);
