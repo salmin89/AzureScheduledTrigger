@@ -5,6 +5,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.IE;
+using System.Threading;
 
 namespace AzureScheduledTrigger
 {
@@ -17,6 +18,8 @@ namespace AzureScheduledTrigger
         private TestContext testContextInstance;
         private IWebDriver driver;
         private string appURL;
+        private string userName;
+        private string passWord;
 
         public MySeleniumTests()
         {
@@ -24,16 +27,14 @@ namespace AzureScheduledTrigger
 
         [TestMethod]
         [TestCategory("Chrome")]
-        public void TheBingSearchTest()
+        public void Run()
         {
             driver.Navigate().GoToUrl(appURL);
 
-            var img = driver.FindElement(By.TagName("img"));
-            var src = img.GetAttribute("src");
-            //driver.FindElement(By.Id("sb_form_q")).SendKeys("Azure Pipelines");
-            //driver.FindElement(By.Id("sb_form_go")).Click();
-            //driver.FindElement(By.XPath("//ol[@id='b_results']/li/h2/a/strong[3]")).Click();
-            Assert.IsTrue(!string.IsNullOrEmpty(src), "Verified title of the page");
+            this.AcceptTerms();
+            this.GoToLogin();
+            this.Login();
+            //Assert.IsTrue(true, "Verified title of the page");
         }
 
         /// <summary>
@@ -53,9 +54,11 @@ namespace AzureScheduledTrigger
         }
 
         [TestInitialize()]
-        public void SetupTest()
+        public void Setup()
         {
-            appURL = "https://skenderovic.se/";
+            appURL = "https://krunker.io/";
+            userName = "testar12345";
+            passWord = "testar12345";
 
             string browser = "Chrome";
             switch (browser)
@@ -77,9 +80,42 @@ namespace AzureScheduledTrigger
         }
 
         [TestCleanup()]
-        public void MyTestCleanup()
+        public void Cleanup()
         {
             driver.Quit();
+        }
+
+        private void AcceptTerms()
+        {
+            var consentWindow = driver.FindElement(By.Id("consentWindow"));
+            var termsBtns = consentWindow.FindElements(By.ClassName("termsBtn"));
+            var acceptBtn = termsBtns[termsBtns.Count - 1]; // Click the last btn
+            acceptBtn.Click();
+            Thread.Sleep(500);
+        }
+
+        private void GoToLogin()
+        {
+            var signedOutHeaderBar = driver.FindElement(By.Id("signedOutHeaderBar"));
+            var loginBtns = signedOutHeaderBar.FindElements(By.ClassName("button"));
+            var loginBtn = loginBtns[0]; //First button
+            loginBtn.Click();
+            Thread.Sleep(500);
+        }
+
+        private void Login()
+        {
+            var menuWindow = driver.FindElement(By.Id("menuWindow"));
+            var accName = driver.FindElement(By.Id("accName"));
+            var accPass = driver.FindElement(By.Id("accPass"));
+            var accountButtons = menuWindow.FindElements(By.ClassName("accountButton"));
+            var loginBtn = accountButtons[accountButtons.Count - 1]; // Last btn is Login
+            
+            accName.SendKeys(userName);
+            accPass.SendKeys(passWord);
+
+            loginBtn.Click();
+            Thread.Sleep(500);
         }
     }
 }

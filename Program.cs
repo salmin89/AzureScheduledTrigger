@@ -17,8 +17,9 @@ namespace AzureScheduledTrigger
 
             var s = new MySeleniumTests();
 
-            s.SetupTest();
-            s.TheBingSearchTest();
+            s.Setup();
+            s.Run();
+            //s.Cleanup();
 
             Console.ReadKey();
 
