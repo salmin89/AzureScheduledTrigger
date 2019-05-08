@@ -111,9 +111,9 @@ namespace AzureScheduledTrigger
             script = js.ExecuteScript("return localStorage.setItem('krunker_token', '" + krunker_token + "')");
             script = js.ExecuteScript("return localStorage.setItem('krunker_username', '" + krunker_username + "')");
             script = js.ExecuteScript("return localStorage.setItem('krunker_id', '" + krunker_id + "')");
-            script = js.ExecuteScript("return window.location.href = window.location.href");
+            script = js.ExecuteScript("return window.location.href = '" + appURL + "'");
 
-            Thread.Sleep(1500);
+            Thread.Sleep(3000);
         }
 
         private void ClaimFreeKR()
