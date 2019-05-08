@@ -1,11 +1,8 @@
-﻿using System;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.IE;
 using System.Threading;
+using System.Configuration;
 
 namespace AzureScheduledTrigger
 {
@@ -17,9 +14,9 @@ namespace AzureScheduledTrigger
     {
         private TestContext testContextInstance;
         private IWebDriver driver;
+        private object script;
+        IJavaScriptExecutor js;
         private string appURL;
-        private string userName;
-        private string passWord;
 
         public MySeleniumTests()
         {
@@ -30,10 +27,13 @@ namespace AzureScheduledTrigger
         public void Run()
         {
             driver.Navigate().GoToUrl(appURL);
+            this.SetLocalStorage();
+            this.ClaimFreeKR();
 
-            this.AcceptTerms();
-            this.GoToLogin();
-            this.Login();
+            //this.AcceptTerms();
+            //this.GoToLogin();
+            //this.Login();
+
             //Assert.IsTrue(true, "Verified title of the page");
         }
 
@@ -57,26 +57,8 @@ namespace AzureScheduledTrigger
         public void Setup()
         {
             appURL = "https://krunker.io/";
-            userName = "testar12345";
-            passWord = "testar12345";
-
-            string browser = "Chrome";
-            switch (browser)
-            {
-                case "Chrome":
-                    driver = new ChromeDriver();
-                    break;
-                //case "Firefox":
-                //    driver = new FirefoxDriver();
-                //    break;
-                //case "IE":
-                //    driver = new InternetExplorerDriver();
-                //    break;
-                default:
-                    driver = new ChromeDriver();
-                    break;
-            }
-
+            driver = new ChromeDriver();
+            js = driver as IJavaScriptExecutor;
         }
 
         [TestCleanup()]
@@ -116,6 +98,28 @@ namespace AzureScheduledTrigger
 
             loginBtn.Click();
             Thread.Sleep(500);
+        }
+
+        private void SetLocalStorage()
+        {
+            var consent = ConfigurationManager.AppSettings["consent"];
+            var krunker_token = ConfigurationManager.AppSettings["krunker_token"];
+            var krunker_username = ConfigurationManager.AppSettings["krunker_username"];
+            var krunker_id = ConfigurationManager.AppSettings["krunker_id"];
+
+            script = js.ExecuteScript("return localStorage.setItem('consent', '" + consent + "')");
+            script = js.ExecuteScript("return localStorage.setItem('krunker_token', '" + krunker_token + "')");
+            script = js.ExecuteScript("return localStorage.setItem('krunker_username', '" + krunker_username + "')");
+            script = js.ExecuteScript("return localStorage.setItem('krunker_id', '" + krunker_id + "')");
+            script = js.ExecuteScript("return window.location.href = window.location.href");
+
+            Thread.Sleep(1500);
+        }
+
+        private void ClaimFreeKR()
+        {
+            var claimImg = driver.FindElement(By.Id("claimImg"));
+            claimImg.Click();
         }
     }
 }
